@@ -1,0 +1,29 @@
+---
+title: "HW 2"
+author: "Sam Loewen"
+date: "9/27/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+## Problem 1
+
+First I will read and clean the Mr. Trash Wheel sheet:
+
+*   specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using arguments in read_excel
+*   use reasonable variable names
+*   omit rows that do not include dumpster-specific data
+*   round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
+
+```{r}
+trash_wheel = 
+  readxl::read_excel("./data/HealthyHarborWaterWheel.xlsx") %>%
+  janitor::clean_names()
+trash_wheel
+```
+
