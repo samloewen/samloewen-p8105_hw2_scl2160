@@ -9,6 +9,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(readxl)
 ```
 
 ## Problem 1
@@ -22,8 +23,26 @@ First I will read and clean the Mr. Trash Wheel sheet:
 
 ```{r}
 trash_wheel = 
-  readxl::read_excel("./data/HealthyHarborWaterWheel.xlsx") %>%
-  janitor::clean_names()
-trash_wheel
+  read_excel("./data/HealthyHarborWaterWheel.xlsx", sheet=1)
+  skimr::skim(trash_wheel)
+
+#cleaning names
+trash_wheel = 
+  janitor::clean_names(trash_wheel)
+  names(trash_wheel)
+ 
+#removing 'total' rows, x15 column   
+trash_wheel=
+  tidyr::drop_na(trash_wheel, dumpster)
+
+#removing x15 column, rounding sports balls
+trash_wheel=
+  select(trash_wheel,-x15)
+  mutate(trash_wheel, sports_balls = as.integer(sports_balls))
 ```
+
+
+
+
+
 
