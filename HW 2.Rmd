@@ -23,23 +23,45 @@ First I will read and clean the Mr. Trash Wheel sheet:
 
 ```{r}
 trash_wheel = 
-  read_excel("./data/HealthyHarborWaterWheel.xlsx", sheet=1)
-  skimr::skim(trash_wheel)
-
-#cleaning names
-trash_wheel = 
-  janitor::clean_names(trash_wheel)
-  names(trash_wheel)
- 
-#removing 'total' rows, x15 column   
-trash_wheel=
-  tidyr::drop_na(trash_wheel, dumpster)
-
-#removing x15 column, rounding sports balls
-trash_wheel=
-  select(trash_wheel,-x15)
-  mutate(trash_wheel, sports_balls = as.integer(sports_balls))
+  read_excel("./data/HealthyHarborWaterWheel.xlsx", sheet = 1) %>% 
+  janitor::clean_names() %>% 
+  drop_na(dumpster) %>% 
+  select(-x15) %>% 
+  mutate(sports_balls = as.integer(sports_balls))
 ```
+
+Next I will read and clean precipitation data for 2017 and 2018. For each omit rows without precipitation data and add a variable year. Next, combine precipitation datasets and 
+
+convert month to a character variable (the variable month.name is built into R and should be useful).
+
+```{r}
+precip_17 = 
+  read_excel("./data/HealthyHarborWaterWheel.xlsx", sheet = 4, skip = 1) %>% 
+  janitor::clean_names() %>% 
+  drop_na() %>% 
+  mutate(year = 2017) %>% 
+  select(year, month, total)
+precip_17
+
+precip_18 = 
+  read_excel("./data/HealthyHarborWaterWheel.xlsx", sheet = 3, skip = 1) %>% 
+  janitor::clean_names() %>% 
+  drop_na() %>% 
+  mutate(year = 2018) %>% 
+  select(year, month, total)
+precip_18
+
+precip_all = 
+  full_join(precip_17, precip_18)
+precip_all
+```
+
+
+
+
+Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in both resulting datasets, and give examples of key variables. For available data, what was the total precipitation in 2018? What was the median number of sports balls in a dumpster in 2017?
+
+## Problem 2
 
 
 
