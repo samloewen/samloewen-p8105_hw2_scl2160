@@ -67,9 +67,33 @@ My trash_wheel data set has `r nrow(trash_wheel)` observations, and my precip_al
 The precip_all dataframe can show us that the total precipitation in 2018 was `r sum(pull(precip_all, dumpster))`.
 
 
-
 ## Problem 2
 
+First, clean the data in pols-month.csv. Use separate() to break up the variable mon into integer variables year, month, and day; replace month number with month name; create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
+
+```{r}
+pols =
+  read_csv("./data/pols-month.csv") %>%
+  janitor::clean_names() %>% 
+  separate(mon, c("year", "mon", "day")) %>%
+  mutate(prez = ifelse(prez_gop == 1, "gop", "dem")) %>% 
+  select (-prez_gop, -prez_dem, -day)
+pols
+```
+
+First, clean the data in pols-month.csv. Use separate() to break up the variable mon into integer variables year, month, and day; replace month number with month name; create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
+
+Second, clean the data in snp.csv using a similar process to the above. For consistency across datasets, arrange according to year and month, and organize so that year and month are the leading columns.
+
+Third, tidy the unemployment data so that it can be merged with the previous datasets. This process will involve switching from “wide” to “long” format; ensuring that key variables have the same name; and ensuring that key variables take the same values.
+
+Join the datasets by merging snp into pols, and merging unemployment into the result.
+
+Write a short paragraph about these datasets. Explain briefly what each dataset contained, and describe the resulting dataset (e.g. give the dimension, range of years, and names of key variables).
+
+Note: we could have used a date variable as a key instead of creating year and month keys; doing so would help with some kinds of plotting, and be a more accurate representation of the data. Date formats are tricky, though. For more information check out the lubridate package in the tidyverse.
+
+Problem 3
 
 
 
