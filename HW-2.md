@@ -19,7 +19,7 @@ First I will read and clean the Mr. Trash Wheel sheet:
 
 ``` r
 trash_wheel = 
-  read_excel("./data/HealthyHarborWaterWheel.xlsx", sheet = 1) %>% 
+  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 1) %>% 
   janitor::clean_names() %>% 
   drop_na(dumpster) %>% 
   select(-x15) %>% 
@@ -28,6 +28,8 @@ trash_wheel =
 
     ## New names:
     ## * `` -> ...15
+    ## * `` -> ...16
+    ## * `` -> ...17
 
 Next I will read and clean precipitation data for 2017 and 2018. For
 each omit rows without precipitation data and add a variable year. Next,
@@ -38,7 +40,7 @@ into R and should be useful).
 
 ``` r
 precip_17 = 
-  read_excel("./data/HealthyHarborWaterWheel.xlsx", sheet = 4, skip = 1) %>% 
+  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 6, skip = 1) %>% 
   janitor::clean_names() %>% 
   drop_na() %>% 
   mutate(year = 2017) %>% 
@@ -64,7 +66,7 @@ precip_17
 
 ``` r
 precip_18 = 
-  read_excel("./data/HealthyHarborWaterWheel.xlsx", sheet = 3, skip = 1) %>% 
+  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 5, skip = 1) %>% 
   janitor::clean_names() %>% 
   drop_na() %>% 
   mutate(year = 2018) %>% 
@@ -72,16 +74,21 @@ precip_18 =
 precip_18
 ```
 
-    ## # A tibble: 7 x 3
-    ##    year month total
-    ##   <dbl> <dbl> <dbl>
-    ## 1  2018     1  0.96
-    ## 2  2018     2  5.3 
-    ## 3  2018     3  2.18
-    ## 4  2018     4  3.2 
-    ## 5  2018     5  9.27
-    ## 6  2018     6  0.2 
-    ## 7  2018     7  2.39
+    ## # A tibble: 12 x 3
+    ##     year month total
+    ##    <dbl> <dbl> <dbl>
+    ##  1  2018     1  0.94
+    ##  2  2018     2  4.8 
+    ##  3  2018     3  2.69
+    ##  4  2018     4  4.69
+    ##  5  2018     5  9.27
+    ##  6  2018     6  4.77
+    ##  7  2018     7 10.2 
+    ##  8  2018     8  6.45
+    ##  9  2018     9 10.5 
+    ## 10  2018    10  2.12
+    ## 11  2018    11  7.82
+    ## 12  2018    12  6.11
 
 ``` r
 precip_all = 
@@ -94,7 +101,7 @@ precip_all =
 precip_all
 ```
 
-    ## # A tibble: 19 x 3
+    ## # A tibble: 24 x 3
     ##     year month total
     ##    <dbl> <dbl> <dbl>
     ##  1  2017     1  2.34
@@ -107,15 +114,7 @@ precip_all
     ##  8  2017     8  4.44
     ##  9  2017     9  1.95
     ## 10  2017    10  0   
-    ## 11  2017    11  0.11
-    ## 12  2017    12  0.94
-    ## 13  2018     1  0.96
-    ## 14  2018     2  5.3 
-    ## 15  2018     3  2.18
-    ## 16  2018     4  3.2 
-    ## 17  2018     5  9.27
-    ## 18  2018     6  0.2 
-    ## 19  2018     7  2.39
+    ## # ... with 14 more rows
 
 Write a paragraph about these data; you are encouraged to use inline R.
 Be sure to note the number of observations in both resulting datasets,

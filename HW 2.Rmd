@@ -23,7 +23,7 @@ First I will read and clean the Mr. Trash Wheel sheet:
 
 ```{r}
 trash_wheel = 
-  read_excel("./data/HealthyHarborWaterWheel.xlsx", sheet = 1) %>% 
+  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 1) %>% 
   janitor::clean_names() %>% 
   drop_na(dumpster) %>% 
   select(-x15) %>% 
@@ -36,7 +36,7 @@ convert month to a character variable (the variable month.name is built into R a
 
 ```{r}
 precip_17 = 
-  read_excel("./data/HealthyHarborWaterWheel.xlsx", sheet = 4, skip = 1) %>% 
+  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 6, skip = 1) %>% 
   janitor::clean_names() %>% 
   drop_na() %>% 
   mutate(year = 2017) %>% 
@@ -44,7 +44,7 @@ precip_17 =
 precip_17
 
 precip_18 = 
-  read_excel("./data/HealthyHarborWaterWheel.xlsx", sheet = 3, skip = 1) %>% 
+  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 5, skip = 1) %>% 
   janitor::clean_names() %>% 
   drop_na() %>% 
   mutate(year = 2018) %>% 
@@ -55,8 +55,6 @@ precip_all =
   full_join(precip_17, precip_18)
 precip_all
 ```
-
-
 
 
 Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in both resulting datasets, and give examples of key variables. For available data, what was the total precipitation in 2018? What was the median number of sports balls in a dumpster in 2017?
