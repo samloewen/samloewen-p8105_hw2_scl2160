@@ -114,7 +114,8 @@ precip_18
 
 ``` r
 precip_all = 
-  full_join(precip_17, precip_18)
+  full_join(precip_17, precip_18) %>% 
+  mutate(month = month.name[month])
 ```
 
     ## Joining, by = c("year", "month", "total")
@@ -124,18 +125,18 @@ precip_all
 ```
 
     ## # A tibble: 24 x 3
-    ##     year month total
-    ##    <dbl> <dbl> <dbl>
-    ##  1  2017     1  2.34
-    ##  2  2017     2  1.46
-    ##  3  2017     3  3.57
-    ##  4  2017     4  3.99
-    ##  5  2017     5  5.64
-    ##  6  2017     6  1.4 
-    ##  7  2017     7  7.09
-    ##  8  2017     8  4.44
-    ##  9  2017     9  1.95
-    ## 10  2017    10  0   
+    ##     year month     total
+    ##    <dbl> <chr>     <dbl>
+    ##  1  2017 January    2.34
+    ##  2  2017 February   1.46
+    ##  3  2017 March      3.57
+    ##  4  2017 April      3.99
+    ##  5  2017 May        5.64
+    ##  6  2017 June       1.4 
+    ##  7  2017 July       7.09
+    ##  8  2017 August     4.44
+    ##  9  2017 September  1.95
+    ## 10  2017 October    0   
     ## # ... with 14 more rows
 
 Write a paragraph about these data; you are encouraged to use inline R.
@@ -144,4 +145,212 @@ and give examples of key variables. For available data, what was the
 total precipitation in 2018? What was the median number of sports balls
 in a dumpster in 2017?
 
+There are x observations in the trash\_wheel dataset and x in the
+precip\_all dataset.
+
+My trash\_wheel data set has 344 observations, and my precip\_all data
+set has 24 observations. Trash\_wheel includes variables to show the
+number of items removed from the harbor, such as `glass_bottles` and
+`grocery_bags`. We can also see that the total number of sports ball in
+a dumpster in 2017 was r sum(pull(trash\_wheel, dumpster)).
+
+The precip\_all dataframe can show us that the total precipitation in
+2018 was r sum(pull(precip\_all, dumpster)).
+
 ## Problem 2
+
+First, clean the data in pols-month.csv. Use separate() to break up the
+variable mon into integer variables year, month, and day; replace month
+number with month name; create a president variable taking values gop
+and dem, and remove prez\_dem and prez\_gop; and remove the day
+variable.
+
+``` r
+pols =
+  read_csv("./data/pols-month.csv") %>%
+  janitor::clean_names() %>% 
+  separate(mon, c("year", "month", "day")) %>%
+  mutate(prez = ifelse(prez_gop == 1, "gop", "dem")) %>% 
+  mutate(year = as.numeric(year)) %>% 
+  select (-prez_gop, -prez_dem, -day)
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   mon = col_date(format = ""),
+    ##   prez_gop = col_double(),
+    ##   gov_gop = col_double(),
+    ##   sen_gop = col_double(),
+    ##   rep_gop = col_double(),
+    ##   prez_dem = col_double(),
+    ##   gov_dem = col_double(),
+    ##   sen_dem = col_double(),
+    ##   rep_dem = col_double()
+    ## )
+
+``` r
+pols
+```
+
+    ## # A tibble: 822 x 9
+    ##     year month gov_gop sen_gop rep_gop gov_dem sen_dem rep_dem prez 
+    ##    <dbl> <chr>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl> <chr>
+    ##  1  1947 01         23      51     253      23      45     198 dem  
+    ##  2  1947 02         23      51     253      23      45     198 dem  
+    ##  3  1947 03         23      51     253      23      45     198 dem  
+    ##  4  1947 04         23      51     253      23      45     198 dem  
+    ##  5  1947 05         23      51     253      23      45     198 dem  
+    ##  6  1947 06         23      51     253      23      45     198 dem  
+    ##  7  1947 07         23      51     253      23      45     198 dem  
+    ##  8  1947 08         23      51     253      23      45     198 dem  
+    ##  9  1947 09         23      51     253      23      45     198 dem  
+    ## 10  1947 10         23      51     253      23      45     198 dem  
+    ## # ... with 812 more rows
+
+Second, clean the data in snp.csv using a similar process to the above.
+For consistency across datasets, arrange according to year and month,
+and organize so that year and month are the leading columns.
+
+``` r
+snp =
+  read_csv("./data/snp.csv") %>%
+  janitor::clean_names() %>% 
+  separate(date, c("month", "day", "year")) %>% 
+  mutate(year = as.numeric(year)) %>% 
+  select (year, month, -day, close) %>% 
+  arrange (year, month)
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   date = col_character(),
+    ##   close = col_double()
+    ## )
+
+``` r
+#fix the ascending order#
+snp
+```
+
+    ## # A tibble: 787 x 3
+    ##     year month close
+    ##    <dbl> <chr> <dbl>
+    ##  1  1950 1      17.0
+    ##  2  1950 10     19.5
+    ##  3  1950 11     19.5
+    ##  4  1950 12     20.4
+    ##  5  1950 2      17.2
+    ##  6  1950 3      17.3
+    ##  7  1950 4      18.0
+    ##  8  1950 5      18.8
+    ##  9  1950 6      17.7
+    ## 10  1950 7      17.8
+    ## # ... with 777 more rows
+
+Third, tidy the unemployment data so that it can be merged with the
+previous datasets. This process will involve switching from “wide” to
+“long” format; ensuring that key variables have the same name; and
+ensuring that key variables take the same values.
+
+``` r
+unemp=
+  read_csv("./data/unemployment.csv") %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    jan:dec, 
+    names_to = "month", 
+    values_to = "snp")
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   Year = col_double(),
+    ##   Jan = col_double(),
+    ##   Feb = col_double(),
+    ##   Mar = col_double(),
+    ##   Apr = col_double(),
+    ##   May = col_double(),
+    ##   Jun = col_double(),
+    ##   Jul = col_double(),
+    ##   Aug = col_double(),
+    ##   Sep = col_double(),
+    ##   Oct = col_double(),
+    ##   Nov = col_double(),
+    ##   Dec = col_double()
+    ## )
+
+``` r
+unemp
+```
+
+    ## # A tibble: 816 x 3
+    ##     year month   snp
+    ##    <dbl> <chr> <dbl>
+    ##  1  1948 jan     3.4
+    ##  2  1948 feb     3.8
+    ##  3  1948 mar     4  
+    ##  4  1948 apr     3.9
+    ##  5  1948 may     3.5
+    ##  6  1948 jun     3.6
+    ##  7  1948 jul     3.6
+    ##  8  1948 aug     3.9
+    ##  9  1948 sep     3.8
+    ## 10  1948 oct     3.7
+    ## # ... with 806 more rows
+
+Join the datasets by merging snp into pols, and merging unemployment
+into the result.
+
+``` r
+q2_merge =
+  left_join(pols, snp, by = c("year","month"))
+q2_merge
+```
+
+    ## # A tibble: 822 x 10
+    ##     year month gov_gop sen_gop rep_gop gov_dem sen_dem rep_dem prez  close
+    ##    <dbl> <chr>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl> <chr> <dbl>
+    ##  1  1947 01         23      51     253      23      45     198 dem      NA
+    ##  2  1947 02         23      51     253      23      45     198 dem      NA
+    ##  3  1947 03         23      51     253      23      45     198 dem      NA
+    ##  4  1947 04         23      51     253      23      45     198 dem      NA
+    ##  5  1947 05         23      51     253      23      45     198 dem      NA
+    ##  6  1947 06         23      51     253      23      45     198 dem      NA
+    ##  7  1947 07         23      51     253      23      45     198 dem      NA
+    ##  8  1947 08         23      51     253      23      45     198 dem      NA
+    ##  9  1947 09         23      51     253      23      45     198 dem      NA
+    ## 10  1947 10         23      51     253      23      45     198 dem      NA
+    ## # ... with 812 more rows
+
+``` r
+final_db = 
+  left_join(q2_merge,unemp, by =c("year","month"))
+final_db
+```
+
+    ## # A tibble: 822 x 11
+    ##     year month gov_gop sen_gop rep_gop gov_dem sen_dem rep_dem prez  close
+    ##    <dbl> <chr>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl> <chr> <dbl>
+    ##  1  1947 01         23      51     253      23      45     198 dem      NA
+    ##  2  1947 02         23      51     253      23      45     198 dem      NA
+    ##  3  1947 03         23      51     253      23      45     198 dem      NA
+    ##  4  1947 04         23      51     253      23      45     198 dem      NA
+    ##  5  1947 05         23      51     253      23      45     198 dem      NA
+    ##  6  1947 06         23      51     253      23      45     198 dem      NA
+    ##  7  1947 07         23      51     253      23      45     198 dem      NA
+    ##  8  1947 08         23      51     253      23      45     198 dem      NA
+    ##  9  1947 09         23      51     253      23      45     198 dem      NA
+    ## 10  1947 10         23      51     253      23      45     198 dem      NA
+    ## # ... with 812 more rows, and 1 more variable: snp <dbl>
+
+Write a short paragraph about these datasets. Explain briefly what each
+dataset contained, and describe the resulting dataset (e.g. give the
+dimension, range of years, and names of key variables).
+
+Note: we could have used a date variable as a key instead of creating
+year and month keys; doing so would help with some kinds of plotting,
+and be a more accurate representation of the data. Date formats are
+tricky, though. For more information check out the lubridate package in
+the tidyverse.
+
+Problem 3
