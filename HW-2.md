@@ -145,17 +145,13 @@ and give examples of key variables. For available data, what was the
 total precipitation in 2018? What was the median number of sports balls
 in a dumpster in 2017?
 
-There are x observations in the trash\_wheel dataset and x in the
-precip\_all dataset.
-
 My trash\_wheel data set has 344 observations, and my precip\_all data
 set has 24 observations. Trash\_wheel includes variables to show the
 number of items removed from the harbor, such as `glass_bottles` and
 `grocery_bags`. We can also see that the total number of sports ball in
-a dumpster in 2017 was r sum(pull(trash\_wheel, dumpster)).
-
-The precip\_all dataframe can show us that the total precipitation in
-2018 was r sum(pull(precip\_all, dumpster)).
+a dumpster in 2017 was r sum(pull(trash\_wheel, dumpster)).The
+precip\_all dataframe can show us that the total precipitation in 2018
+was r sum(pull(precip\_all, dumpster)).
 
 ## Problem 2
 
@@ -343,9 +339,13 @@ final_db
     ## 10  1947 10         23      51     253      23      45     198 dem      NA
     ## # ... with 812 more rows, and 1 more variable: snp <dbl>
 
-Write a short paragraph about these datasets. Explain briefly what each
-dataset contained, and describe the resulting dataset (e.g. give the
-dimension, range of years, and names of key variables).
+These datasets provide information on who was in power by month starting
+in the late 1940s and early 50s including `snp` and `close` data,
+although I don’t know what those are. The resulting database `final_db`
+combines all these datasets to show variables such as number of senators
+per party (`sen_dem` and `sen_gop`), the political part of the president
+(`prez`) and `snp`, and `close` data. The databases has 822 observations
+and covers January 1947 to June 2015.
 
 ## Problem 3
 
