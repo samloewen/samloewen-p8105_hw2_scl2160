@@ -360,10 +360,11 @@ duplicate rows” to get started).
 baby_names = 
   read_csv("./data/Popular_Baby_Names.csv") %>% 
   janitor::clean_names() %>% 
-  mutate(ethnicity = replace(ethnicity, ethnicity == "ASIAN AND PACI", "ASIAN AND PACIFIC ISLANDER")) %>% 
-  mutate(ethnicity = replace(ethnicity, ethnicity == "BLACK NON HISP", "BLACK NON HISPANIC")) %>% 
-  mutate(ethnicity = replace(ethnicity, ethnicity == "WHITE NON HISP", "WHITE NON HISPANIC")) %>% 
-  mutate(childs_first_name = toupper(childs_first_name)) %>% 
+  mutate(
+    ethnicity = replace(ethnicity, ethnicity == "ASIAN AND PACI", "ASIAN AND PACIFIC ISLANDER"),
+    ethnicity = replace(ethnicity, ethnicity == "BLACK NON HISP", "BLACK NON HISPANIC"),
+    ethnicity = replace(ethnicity, ethnicity == "WHITE NON HISP", "WHITE NON HISPANIC"), 
+    childs_first_name = toupper(childs_first_name)) %>% 
   distinct()
 ```
 
@@ -389,6 +390,91 @@ popularity of the name “Olivia” as a female baby name over time; this
 should have rows for ethnicities and columns for year. Produce a similar
 table showing the most popular name among male children over time.
 
+``` r
+#olivia
+baby_names_o =
+  baby_names %>%  
+  filter(childs_first_name == "OLIVIA") %>% 
+  pivot_wider(
+    names_from = "year_of_birth",
+    values_from = "rank") %>% 
+  select (-gender, -childs_first_name, -count)
+
+baby_names_o
+```
+
+    ## # A tibble: 23 x 7
+    ##    ethnicity                  `2016` `2015` `2014` `2013` `2012` `2011`
+    ##    <chr>                       <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>
+    ##  1 ASIAN AND PACIFIC ISLANDER      1     NA     NA     NA     NA     NA
+    ##  2 BLACK NON HISPANIC              8     NA     NA     NA     NA     NA
+    ##  3 HISPANIC                       13     NA     NA     NA     NA     NA
+    ##  4 WHITE NON HISPANIC              1     NA     NA     NA     NA     NA
+    ##  5 ASIAN AND PACIFIC ISLANDER     NA      1     NA     NA     NA     NA
+    ##  6 BLACK NON HISPANIC             NA      4     NA     NA     NA     NA
+    ##  7 HISPANIC                       NA     16     NA     NA     NA     NA
+    ##  8 WHITE NON HISPANIC             NA      1     NA     NA     NA     NA
+    ##  9 ASIAN AND PACIFIC ISLANDER     NA     NA      1     NA     NA     NA
+    ## 10 BLACK NON HISPANIC             NA     NA      8     NA     NA     10
+    ## # ... with 13 more rows
+
+``` r
+#boy names
+baby_names_boy = 
+  baby_names %>%
+  filter(gender == "MALE") %>% 
+  pivot_wider(
+    names_from = "year_of_birth",
+    values_from = "rank") %>% 
+  select (-gender, -count)
+
+baby_names_boy
+```
+
+    ## # A tibble: 5,298 x 8
+    ##    ethnicity     childs_first_na~ `2016` `2015` `2014` `2013` `2012` `2011`
+    ##    <chr>         <chr>             <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>
+    ##  1 ASIAN AND PA~ ETHAN                 1     NA     NA     NA     NA     NA
+    ##  2 ASIAN AND PA~ RYAN                  2     NA     NA     NA     NA     NA
+    ##  3 ASIAN AND PA~ MUHAMMAD              3     NA     NA     NA     NA     NA
+    ##  4 ASIAN AND PA~ LUCAS                 4     NA     NA      4     NA     NA
+    ##  5 ASIAN AND PA~ JAYDEN                5     NA     NA     NA     NA     NA
+    ##  6 ASIAN AND PA~ AIDEN                 6      5     NA     NA     NA     NA
+    ##  7 ASIAN AND PA~ DANIEL                7     NA     NA     NA     NA     NA
+    ##  8 ASIAN AND PA~ EVAN                  8     NA     NA     NA     NA     NA
+    ##  9 ASIAN AND PA~ JASON                 9     NA     NA     NA     NA     NA
+    ## 10 ASIAN AND PA~ LIAM                  9     NA     NA     NA     NA     NA
+    ## # ... with 5,288 more rows
+
 Finally, for male, white non-hispanic children born in 2016, produce a
 scatter plot showing the number of children with a name (y axis) against
 the rank in popularity of that name (x axis).
+
+``` r
+scatter_names =
+  baby_names %>% 
+  filter (gender == "MALE", ethnicity == "WHITE NON HISPANIC", year_of_birth == 2016)
+scatter_names
+```
+
+    ## # A tibble: 364 x 6
+    ##    year_of_birth gender ethnicity          childs_first_name count  rank
+    ##            <dbl> <chr>  <chr>              <chr>             <dbl> <dbl>
+    ##  1          2016 MALE   WHITE NON HISPANIC JOSEPH              261     1
+    ##  2          2016 MALE   WHITE NON HISPANIC MICHAEL             260     2
+    ##  3          2016 MALE   WHITE NON HISPANIC DAVID               255     3
+    ##  4          2016 MALE   WHITE NON HISPANIC MOSHE               239     4
+    ##  5          2016 MALE   WHITE NON HISPANIC JACOB               236     5
+    ##  6          2016 MALE   WHITE NON HISPANIC JAMES               231     6
+    ##  7          2016 MALE   WHITE NON HISPANIC BENJAMIN            219     7
+    ##  8          2016 MALE   WHITE NON HISPANIC ALEXANDER           211     8
+    ##  9          2016 MALE   WHITE NON HISPANIC DANIEL              196     9
+    ## 10          2016 MALE   WHITE NON HISPANIC HENRY               196     9
+    ## # ... with 354 more rows
+
+``` r
+ggplot(scatter_names, aes(x = rank, y = count)) + 
+  geom_point()
+```
+
+![](HW-2_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
