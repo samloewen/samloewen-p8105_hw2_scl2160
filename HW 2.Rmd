@@ -177,6 +177,10 @@ scatter_names =
   filter (gender == "MALE", ethnicity == "WHITE NON HISPANIC", year_of_birth == 2016)
 scatter_names
 
-ggplot(scatter_names, aes(x = rank, y = count)) + 
-  geom_point()
+scatter_names %>% 
+  ggplot(aes(x = rank, y = count)) + 
+  geom_point() +
+    labs(title = "Rank v count of names, among non-hispanic white boys born in 2016", 
+    x = "Rank", 
+    y = "Count")
 ```

@@ -473,8 +473,12 @@ scatter_names
     ## # ... with 354 more rows
 
 ``` r
-ggplot(scatter_names, aes(x = rank, y = count)) + 
-  geom_point()
+scatter_names %>% 
+  ggplot(aes(x = rank, y = count)) + 
+  geom_point() +
+    labs(title = "Rank v count of names, among non-hispanic white boys born in 2016", 
+    x = "Rank", 
+    y = "Count")
 ```
 
 ![](HW-2_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
