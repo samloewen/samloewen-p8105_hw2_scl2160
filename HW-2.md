@@ -79,7 +79,7 @@ pols =
   janitor::clean_names() %>% 
   separate(mon, c("year", "month", "day")) %>%
   mutate(prez = ifelse(prez_gop == 1, "gop", "dem")) %>% 
-  mutate(year = as.numeric(year), month = as.numeric(month)) %>% 
+  mutate(year = as.numeric(year)) %>% 
   select (-prez_gop, -prez_dem, -day)
 ```
 
@@ -105,7 +105,7 @@ snp =
   read_csv("./data/snp.csv") %>%
   janitor::clean_names() %>% 
   separate(date, c("month", "day", "year")) %>% 
-  mutate(year = as.numeric(year), month = as.numeric(month)) %>% 
+  mutate(year = as.numeric(year)) %>% 
   select (year, month, -day, close) %>% 
   arrange (year, month)
 ```
@@ -128,21 +128,7 @@ unemp=
   pivot_longer(
     jan:dec, 
     names_to = "month", 
-    values_to = "snp") %>% 
-  mutate(
-    month = replace(month, month == "jan", "1"),
-    month = replace(month, month == "feb", "2"),
-    month = replace(month, month == "mar", "3"),
-    month = replace(month, month == "apr", "4"),
-    month = replace(month, month == "may", "5"),
-    month = replace(month, month == "jun", "6"),
-    month = replace(month, month == "jul", "7"),
-    month = replace(month, month == "aug", "8"),
-    month = replace(month, month == "sep", "9"),
-    month = replace(month, month == "oct", "10"),
-    month = replace(month, month == "nov", "11"),
-    month = replace(month, month == "dec", "12"),
-    month = as.numeric(month))
+    values_to = "snp")
 ```
 
     ## Parsed with column specification:
@@ -162,8 +148,7 @@ unemp=
     ##   Dec = col_double()
     ## )
 
-Join the datasets by merging snp into pols, and merging unemployment
-into the result.
+Now joining the datasets.
 
 ``` r
 q2_merge =
@@ -174,12 +159,12 @@ final_db =
 ```
 
 These datasets provide information on who was in power by month starting
-in the late 1940s and early 50s including `snp` and `close` data,
-although I don’t know what those are. The resulting database `final_db`
+in the late 1940s and early 50s including `snp`, which provides data on
+the S\&P 500, and unemployment data. The resulting database `final_db`
 combines all these datasets to show variables such as number of senators
 per party (`sen_dem` and `sen_gop`), the political part of the president
-(`prez`) and `snp`, and `close` data. The databases has 822 observations
-and covers January 1947 to June 2015.
+(`prez`) and `snp`, and unemployment data. The databases has 822
+observations and covers January 1947 to June 2015.
 
 ## Problem 3
 
@@ -222,20 +207,42 @@ table showing the most popular name among male children over time.
 baby_names_o =
   baby_names %>%  
   filter(childs_first_name == "OLIVIA") %>% 
+  select (-gender, -childs_first_name, -count) %>% 
   pivot_wider(
     names_from = "year_of_birth",
     values_from = "rank") %>% 
-  select (-gender, -childs_first_name, -count)
+  knitr::kable()
 
+baby_names_o
+```
+
+| ethnicity                  | 2016 | 2015 | 2014 | 2013 | 2012 | 2011 |
+| :------------------------- | ---: | ---: | ---: | ---: | ---: | ---: |
+| ASIAN AND PACIFIC ISLANDER |    1 |    1 |    1 |    3 |    3 |    4 |
+| BLACK NON HISPANIC         |    8 |    4 |    8 |    6 |    8 |   10 |
+| HISPANIC                   |   13 |   16 |   16 |   22 |   22 |   18 |
+| WHITE NON HISPANIC         |    1 |    1 |    1 |    1 |    4 |    2 |
+
+``` r
 #boy names
 baby_names_boy = 
   baby_names %>%
-  filter(gender == "MALE") %>% 
+  filter(gender == "MALE", rank == 1) %>% 
+  select (-gender, -count, -rank) %>% 
   pivot_wider(
     names_from = "year_of_birth",
-    values_from = "rank") %>% 
-  select (-gender, -count)
+    values_from = "childs_first_name") %>% 
+  knitr::kable()
+
+baby_names_boy
 ```
+
+| ethnicity                  | 2016   | 2015   | 2014   | 2013   | 2012   | 2011    |
+| :------------------------- | :----- | :----- | :----- | :----- | :----- | :------ |
+| ASIAN AND PACIFIC ISLANDER | ETHAN  | JAYDEN | JAYDEN | JAYDEN | RYAN   | ETHAN   |
+| BLACK NON HISPANIC         | NOAH   | NOAH   | ETHAN  | ETHAN  | JAYDEN | JAYDEN  |
+| HISPANIC                   | LIAM   | LIAM   | LIAM   | JAYDEN | JAYDEN | JAYDEN  |
+| WHITE NON HISPANIC         | JOSEPH | DAVID  | JOSEPH | DAVID  | JOSEPH | MICHAEL |
 
 Finally, for male, white non-hispanic children born in 2016, produce a
 scatter plot showing the number of children with a name (y axis) against
@@ -254,4 +261,4 @@ scatter_names %>%
     y = "Count")
 ```
 
-![](HW-2_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](HW-2_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
