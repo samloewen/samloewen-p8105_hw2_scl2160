@@ -28,12 +28,9 @@ trash_wheel =
   drop_na(dumpster) %>% 
   select(-x15, -x16, -x17) %>% 
   mutate(sports_balls = as.integer(sports_balls))
-trash_wheel
 ```
 
-Next I will read and clean precipitation data for 2017 and 2018. For each omit rows without precipitation data and add a variable year. Next, combine precipitation datasets and 
-
-convert month to a character variable (the variable month.name is built into R and should be useful).
+Next I will read and clean precipitation data for 2017 and 2018. For each omit rows without precipitation data and add a variable year. Next, combine precipitation datasets and convert month to a character variable (the variable month.name is built into R and should be useful).
 
 ```{r}
 precip_17 = 
@@ -42,7 +39,6 @@ precip_17 =
   drop_na() %>% 
   mutate(year = 2017) %>% 
   select(year, month, total)
-precip_17
 
 precip_18 = 
   read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = 5, skip = 1) %>% 
@@ -50,18 +46,20 @@ precip_18 =
   drop_na() %>% 
   mutate(year = 2018) %>% 
   select(year, month, total)
-precip_18
 
 precip_all = 
   full_join(precip_17, precip_18) %>% 
   mutate(month = month.name[month])
-precip_all
 ```
 
-Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in both resulting datasets, and give examples of key variables. For available data, what was the total precipitation in 2018? What was the median number of sports balls in a dumpster in 2017?
+```{r include = FALSE}
+tw_sb =
+  trash_wheel %>%
+  filter(year == 2017) %>%
+  select(year, sports_balls)
+```
 
-My trash_wheel data set has `r nrow(trash_wheel)` observations, and my precip_all data set has `r nrow(precip_all)` observations. Trash_wheel includes variables to show the number of items removed from the harbor, such as `glass_bottles` and `grocery_bags`. We can also see that the total number of sports ball in a dumpster in 2017 was r sum(pull(trash_wheel, dumpster)).The precip_all dataframe can show us that the total precipitation in 2018 was r sum(pull(precip_all, dumpster)).
-
+My trash_wheel data set has `r nrow(trash_wheel)` observations, and my precip_all data set has `r nrow(precip_all)` observations. Trash_wheel includes variables to show the number of items removed from the harbor, such as `glass_bottles` and `grocery_bags`. We can also see that the total number of `sports_balls` in the dumpster in 2017 was `r sum(pull(tw_sb, sports_balls))`. The precip_all dataframe can show us that the total precipitation in 2018 was `r sum(pull(precip_18, total))` inches.
 
 ## Problem 2
 
@@ -73,9 +71,8 @@ pols =
   janitor::clean_names() %>% 
   separate(mon, c("year", "month", "day")) %>%
   mutate(prez = ifelse(prez_gop == 1, "gop", "dem")) %>% 
-  mutate(year = as.numeric(year)) %>% 
+  mutate(year = as.numeric(year), month = as.numeric(month)) %>% 
   select (-prez_gop, -prez_dem, -day)
-pols
 ```
 
 Second, clean the data in snp.csv using a similar process to the above. For consistency across datasets, arrange according to year and month, and organize so that year and month are the leading columns.
@@ -85,11 +82,9 @@ snp =
   read_csv("./data/snp.csv") %>%
   janitor::clean_names() %>% 
   separate(date, c("month", "day", "year")) %>% 
-  mutate(year = as.numeric(year)) %>% 
+  mutate(year = as.numeric(year), month = as.numeric(month)) %>% 
   select (year, month, -day, close) %>% 
   arrange (year, month)
-#fix the ascending order#
-snp
 ```
 
 
@@ -102,8 +97,21 @@ unemp=
   pivot_longer(
     jan:dec, 
     names_to = "month", 
-    values_to = "snp")
-unemp
+    values_to = "snp") %>% 
+  mutate(
+    month = replace(month, month == "jan", "1"),
+    month = replace(month, month == "feb", "2"),
+    month = replace(month, month == "mar", "3"),
+    month = replace(month, month == "apr", "4"),
+    month = replace(month, month == "may", "5"),
+    month = replace(month, month == "jun", "6"),
+    month = replace(month, month == "jul", "7"),
+    month = replace(month, month == "aug", "8"),
+    month = replace(month, month == "sep", "9"),
+    month = replace(month, month == "oct", "10"),
+    month = replace(month, month == "nov", "11"),
+    month = replace(month, month == "dec", "12"),
+    month = as.numeric(month))
 ```
 
 Join the datasets by merging snp into pols, and merging unemployment into the result.
@@ -111,11 +119,9 @@ Join the datasets by merging snp into pols, and merging unemployment into the re
 ```{r}
 q2_merge =
   left_join(pols, snp, by = c("year","month"))
-q2_merge
 
 final_db = 
   left_join(q2_merge,unemp, by =c("year","month"))
-final_db
 ```
 
 These datasets provide information on who was in power by month starting in the late 1940s and early 50s including `snp` and `close` data, although I don't know what those are. The resulting database `final_db` combines all these datasets to show variables such as number of senators per party (`sen_dem` and `sen_gop`), the political part of the president (`prez`) and `snp`, and `close` data. The databases has `r nrow(final_db)` observations and covers January 1947 to June 2015.
@@ -134,8 +140,6 @@ baby_names =
     ethnicity = replace(ethnicity, ethnicity == "WHITE NON HISP", "WHITE NON HISPANIC"), 
     childs_first_name = toupper(childs_first_name)) %>% 
   distinct()
-
-unique(baby_names$ethnicity)
 ```
 
 Produce a well-structured, reader-friendly table showing the rank in popularity of the name “Olivia” as a female baby name over time; this should have rows for ethnicities and columns for year. Produce a similar table showing the most popular name among male children over time.
@@ -150,8 +154,6 @@ baby_names_o =
     values_from = "rank") %>% 
   select (-gender, -childs_first_name, -count)
 
-baby_names_o
-
 #boy names
 baby_names_boy = 
   baby_names %>%
@@ -160,8 +162,6 @@ baby_names_boy =
     names_from = "year_of_birth",
     values_from = "rank") %>% 
   select (-gender, -count)
-
-baby_names_boy
 ```
 
 Finally, for male, white non-hispanic children born in 2016, produce a scatter plot showing the number of children with a name (y axis) against the rank in popularity of that name (x axis).
@@ -170,7 +170,6 @@ Finally, for male, white non-hispanic children born in 2016, produce a scatter p
 scatter_names =
   baby_names %>% 
   filter (gender == "MALE", ethnicity == "WHITE NON HISPANIC", year_of_birth == 2016)
-scatter_names
 
 scatter_names %>% 
   ggplot(aes(x = rank, y = count)) + 
