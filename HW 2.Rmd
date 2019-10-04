@@ -71,20 +71,20 @@ pols =
   read_csv("./data/pols-month.csv") %>%
   janitor::clean_names() %>% 
   separate(mon, c("year", "month", "day")) %>%
-  mutate(prez = ifelse(prez_gop == 1, "gop", "dem")) %>% 
-  mutate(year = as.numeric(year), 
-         month = replace(month, month == "01", "jan"),
-         month = replace(month, month == "02", "feb"),
-         month = replace(month, month == "03", "mar"),
-         month = replace(month, month == "04", "apr"),
-         month = replace(month, month == "05", "may"),
-         month = replace(month, month == "06", "jun"),
-         month = replace(month, month == "07", "july"),
-         month = replace(month, month == "08", "aug"),
-         month = replace(month, month == "09", "sep"),
-         month = replace(month, month == "10", "oct"),
-         month = replace(month, month == "11", "nov"),
-         month = replace(month, month == "12", "dec"))%>% 
+  mutate (prez = ifelse(prez_gop == 1, "gop", "dem"),
+          year = as.numeric(year), 
+          month = replace(month, month == "01", "Jan"),
+          month = replace(month, month == "02", "Feb"),
+          month = replace(month, month == "03", "Mar"),
+          month = replace(month, month == "04", "Apr"),
+          month = replace(month, month == "05", "May"),
+          month = replace(month, month == "06", "Jun"),
+          month = replace(month, month == "07", "Jul"),
+          month = replace(month, month == "08", "Aug"),
+          month = replace(month, month == "09", "Sep"),
+          month = replace(month, month == "10", "Oct"),
+          month = replace(month, month == "11", "Nov"),
+          month = replace(month, month == "12", "Dec")) %>% 
   select (-prez_gop, -prez_dem, -day)
 ```
 
@@ -109,14 +109,15 @@ unemp=
   pivot_longer(
     jan:dec, 
     names_to = "month", 
-    values_to = "snp")
+    values_to = "rate")
 ```
 
 Now joining the datasets.
 
 ```{r}
 q2_merge =
-  left_join(pols, snp, by = c("year","month"))
+  left_join(pols, snp, by =c("year","month"))
+q2_merge
 
 final_db = 
   left_join(q2_merge,unemp, by =c("year","month"))
@@ -136,17 +137,18 @@ baby_names =
     ethnicity = replace(ethnicity, ethnicity == "ASIAN AND PACI", "ASIAN AND PACIFIC ISLANDER"),
     ethnicity = replace(ethnicity, ethnicity == "BLACK NON HISP", "BLACK NON HISPANIC"),
     ethnicity = replace(ethnicity, ethnicity == "WHITE NON HISP", "WHITE NON HISPANIC"), 
-    childs_first_name = toupper(childs_first_name)) %>% 
+    ethnicity = str_to_lower(ethnicity), 
+    gender = str_to_lower(gender), 
+    childs_first_name = str_to_lower(childs_first_name)) %>% 
   distinct()
 ```
 
 Produce a well-structured, reader-friendly table showing the rank in popularity of the name “Olivia” as a female baby name over time; this should have rows for ethnicities and columns for year. Produce a similar table showing the most popular name among male children over time.
 
 ```{r}
-#olivia
 baby_names_o =
   baby_names %>%  
-  filter(childs_first_name == "OLIVIA") %>% 
+  filter(childs_first_name == "olivia") %>% 
   select (-gender, -childs_first_name, -count) %>% 
   pivot_wider(
     names_from = "year_of_birth",
@@ -157,10 +159,9 @@ baby_names_o
 ```
 
 ```{r}
-#boy names
 baby_names_boy = 
   baby_names %>%
-  filter(gender == "MALE", rank == 1) %>% 
+  filter(gender == "male", rank == 1) %>% 
   select (-gender, -count, -rank) %>% 
   pivot_wider(
     names_from = "year_of_birth",

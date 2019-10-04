@@ -78,20 +78,20 @@ pols =
   read_csv("./data/pols-month.csv") %>%
   janitor::clean_names() %>% 
   separate(mon, c("year", "month", "day")) %>%
-  mutate(prez = ifelse(prez_gop == 1, "gop", "dem")) %>% 
-  mutate(year = as.numeric(year), 
-         month = replace(month, month == "01", "jan"),
-         month = replace(month, month == "02", "feb"),
-         month = replace(month, month == "03", "mar"),
-         month = replace(month, month == "04", "apr"),
-         month = replace(month, month == "05", "may"),
-         month = replace(month, month == "06", "jun"),
-         month = replace(month, month == "07", "july"),
-         month = replace(month, month == "08", "aug"),
-         month = replace(month, month == "09", "sep"),
-         month = replace(month, month == "10", "oct"),
-         month = replace(month, month == "11", "nov"),
-         month = replace(month, month == "12", "dec"))%>% 
+  mutate (prez = ifelse(prez_gop == 1, "gop", "dem"),
+          year = as.numeric(year), 
+          month = replace(month, month == "01", "Jan"),
+          month = replace(month, month == "02", "Feb"),
+          month = replace(month, month == "03", "Mar"),
+          month = replace(month, month == "04", "Apr"),
+          month = replace(month, month == "05", "May"),
+          month = replace(month, month == "06", "Jun"),
+          month = replace(month, month == "07", "Jul"),
+          month = replace(month, month == "08", "Aug"),
+          month = replace(month, month == "09", "Sep"),
+          month = replace(month, month == "10", "Oct"),
+          month = replace(month, month == "11", "Nov"),
+          month = replace(month, month == "12", "Dec")) %>% 
   select (-prez_gop, -prez_dem, -day)
 ```
 
@@ -140,7 +140,7 @@ unemp=
   pivot_longer(
     jan:dec, 
     names_to = "month", 
-    values_to = "snp")
+    values_to = "rate")
 ```
 
     ## Parsed with column specification:
@@ -164,8 +164,26 @@ Now joining the datasets.
 
 ``` r
 q2_merge =
-  left_join(pols, snp, by = c("year","month"))
+  left_join(pols, snp, by =c("year","month"))
+q2_merge
+```
 
+    ## # A tibble: 822 x 10
+    ##     year month gov_gop sen_gop rep_gop gov_dem sen_dem rep_dem prez  close
+    ##    <dbl> <chr>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl> <chr> <dbl>
+    ##  1  1947 Jan        23      51     253      23      45     198 dem      NA
+    ##  2  1947 Feb        23      51     253      23      45     198 dem      NA
+    ##  3  1947 Mar        23      51     253      23      45     198 dem      NA
+    ##  4  1947 Apr        23      51     253      23      45     198 dem      NA
+    ##  5  1947 May        23      51     253      23      45     198 dem      NA
+    ##  6  1947 Jun        23      51     253      23      45     198 dem      NA
+    ##  7  1947 Jul        23      51     253      23      45     198 dem      NA
+    ##  8  1947 Aug        23      51     253      23      45     198 dem      NA
+    ##  9  1947 Sep        23      51     253      23      45     198 dem      NA
+    ## 10  1947 Oct        23      51     253      23      45     198 dem      NA
+    ## # ... with 812 more rows
+
+``` r
 final_db = 
   left_join(q2_merge,unemp, by =c("year","month"))
 ```
@@ -195,7 +213,9 @@ baby_names =
     ethnicity = replace(ethnicity, ethnicity == "ASIAN AND PACI", "ASIAN AND PACIFIC ISLANDER"),
     ethnicity = replace(ethnicity, ethnicity == "BLACK NON HISP", "BLACK NON HISPANIC"),
     ethnicity = replace(ethnicity, ethnicity == "WHITE NON HISP", "WHITE NON HISPANIC"), 
-    childs_first_name = toupper(childs_first_name)) %>% 
+    ethnicity = str_to_lower(ethnicity), 
+    gender = str_to_lower(gender), 
+    childs_first_name = str_to_lower(childs_first_name)) %>% 
   distinct()
 ```
 
@@ -215,10 +235,9 @@ should have rows for ethnicities and columns for year. Produce a similar
 table showing the most popular name among male children over time.
 
 ``` r
-#olivia
 baby_names_o =
   baby_names %>%  
-  filter(childs_first_name == "OLIVIA") %>% 
+  filter(childs_first_name == "olivia") %>% 
   select (-gender, -childs_first_name, -count) %>% 
   pivot_wider(
     names_from = "year_of_birth",
@@ -230,16 +249,15 @@ baby_names_o
 
 | ethnicity                  | 2016 | 2015 | 2014 | 2013 | 2012 | 2011 |
 | :------------------------- | ---: | ---: | ---: | ---: | ---: | ---: |
-| ASIAN AND PACIFIC ISLANDER |    1 |    1 |    1 |    3 |    3 |    4 |
-| BLACK NON HISPANIC         |    8 |    4 |    8 |    6 |    8 |   10 |
-| HISPANIC                   |   13 |   16 |   16 |   22 |   22 |   18 |
-| WHITE NON HISPANIC         |    1 |    1 |    1 |    1 |    4 |    2 |
+| asian and pacific islander |    1 |    1 |    1 |    3 |    3 |    4 |
+| black non hispanic         |    8 |    4 |    8 |    6 |    8 |   10 |
+| hispanic                   |   13 |   16 |   16 |   22 |   22 |   18 |
+| white non hispanic         |    1 |    1 |    1 |    1 |    4 |    2 |
 
 ``` r
-#boy names
 baby_names_boy = 
   baby_names %>%
-  filter(gender == "MALE", rank == 1) %>% 
+  filter(gender == "male", rank == 1) %>% 
   select (-gender, -count, -rank) %>% 
   pivot_wider(
     names_from = "year_of_birth",
@@ -251,10 +269,10 @@ baby_names_boy
 
 | ethnicity                  | 2016   | 2015   | 2014   | 2013   | 2012   | 2011    |
 | :------------------------- | :----- | :----- | :----- | :----- | :----- | :------ |
-| ASIAN AND PACIFIC ISLANDER | ETHAN  | JAYDEN | JAYDEN | JAYDEN | RYAN   | ETHAN   |
-| BLACK NON HISPANIC         | NOAH   | NOAH   | ETHAN  | ETHAN  | JAYDEN | JAYDEN  |
-| HISPANIC                   | LIAM   | LIAM   | LIAM   | JAYDEN | JAYDEN | JAYDEN  |
-| WHITE NON HISPANIC         | JOSEPH | DAVID  | JOSEPH | DAVID  | JOSEPH | MICHAEL |
+| asian and pacific islander | ethan  | jayden | jayden | jayden | ryan   | ethan   |
+| black non hispanic         | noah   | noah   | ethan  | ethan  | jayden | jayden  |
+| hispanic                   | liam   | liam   | liam   | jayden | jayden | jayden  |
+| white non hispanic         | joseph | david  | joseph | david  | joseph | michael |
 
 Finally, for male, white non-hispanic children born in 2016, produce a
 scatter plot showing the number of children with a name (y axis) against
