@@ -72,7 +72,19 @@ pols =
   janitor::clean_names() %>% 
   separate(mon, c("year", "month", "day")) %>%
   mutate(prez = ifelse(prez_gop == 1, "gop", "dem")) %>% 
-  mutate(year = as.numeric(year)) %>% 
+  mutate(year = as.numeric(year), 
+         month = replace(month, month == "01", "jan"),
+         month = replace(month, month == "02", "feb"),
+         month = replace(month, month == "03", "mar"),
+         month = replace(month, month == "04", "apr"),
+         month = replace(month, month == "05", "may"),
+         month = replace(month, month == "06", "jun"),
+         month = replace(month, month == "07", "july"),
+         month = replace(month, month == "08", "aug"),
+         month = replace(month, month == "09", "sep"),
+         month = replace(month, month == "10", "oct"),
+         month = replace(month, month == "11", "nov"),
+         month = replace(month, month == "12", "dec"))%>% 
   select (-prez_gop, -prez_dem, -day)
 ```
 
@@ -142,7 +154,6 @@ baby_names_o =
   knitr::kable()
 
 baby_names_o
-
 ```
 
 ```{r}
