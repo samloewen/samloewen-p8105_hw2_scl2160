@@ -61,8 +61,8 @@ precip_all =
 My trash\_wheel data set has 344 observations, and my precip\_all data
 set has 24 observations. Trash\_wheel includes variables to show the
 number of items removed from the harbor, such as `glass_bottles` and
-`grocery_bags`. We can also see that the total number of `sports_balls`
-in the dumpster in 2017 was 530. The precip\_all dataframe can show us
+`grocery_bags`. We can also see that the median number of `sports_balls`
+in the dumpster in 2017 was 8. The precip\_all dataframe can show us
 that the total precipitation in 2018 was 70.33 inches.
 
 ## Problem 2
@@ -162,9 +162,9 @@ These datasets provide information on who was in power by month starting
 in the late 1940s and early 50s including `snp`, which provides data on
 the S\&P 500, and unemployment data. The resulting database `final_db`
 combines all these datasets to show variables such as number of senators
-per party (`sen_dem` and `sen_gop`), the political part of the president
-(`prez`) and `snp`, and unemployment data. The databases has 822
-observations and covers January 1947 to June 2015.
+per party (`sen_dem` and `sen_gop`), the political party of the
+president (`prez`) and `snp`, and unemployment data. The databases has
+822 observations and covers January 1947 to June 2015.
 
 ## Problem 3
 
